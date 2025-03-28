@@ -1,83 +1,56 @@
-import React, { useState } from 'react'
+import { useState } from 'react'
 import ContactImage from '../assets/image/Contact.jpg'
 
-interface ContactFormState {
-  name: string
-  email: string
-  message: string
-}
-
-interface ContactFormErrors {
-  name: string
-  email: string
-  message: string
-}
-
-const validateEmail = (email: string): boolean => {
-  const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-  return regex.test(email)
-}
-
 export const Contact = () => {
-  const [formState, setFormState] = useState<ContactFormState>({
+  // Состояния формы
+  const [formData, setFormData] = useState({
     name: '',
     email: '',
     message: '',
   })
 
-  const [formErrors, setFormErrors] = useState<ContactFormErrors>({
+  const [errors, setErrors] = useState({
     name: '',
     email: '',
     message: '',
   })
 
-  const [isSubmitted, setIsSubmitted] = useState<boolean>(false) // Новое состояние для сообщения об успешной отправке
+  const [isSubmitted, setIsSubmitted] = useState(false)
 
+  // Проверка email
+  const isValidEmail = (email: string) =>
+    /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
+
+  // Обработчик изменений
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
     const { name, value } = e.target
-    setFormState(prevState => ({
-      ...prevState,
-      [name]: value,
-    }))
-    setFormErrors(prevState => ({
-      ...prevState,
-      [name]: '', // Clear error when typing
-    }))
-    setIsSubmitted(false) // Скрыть сообщение об успешной отправке при изменении полей
+    setFormData(prev => ({ ...prev, [name]: value }))
+    setErrors(prev => ({ ...prev, [name]: '' }))
   }
 
+  // Отправка формы
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
 
-    let isValid = true
-    const newErrors: ContactFormErrors = { name: '', email: '', message: '' }
-
-    if (!formState.name) {
-      newErrors.name = 'Name is required'
-      isValid = false
+    // Валидация
+    const newErrors = {
+      name: formData.name ? '' : 'Имя обязательно',
+      email: formData.email
+        ? isValidEmail(formData.email)
+          ? ''
+          : 'Неверный формат email'
+        : 'Email обязателен',
+      message: formData.message ? '' : 'Сообщение обязательно',
     }
 
-    if (!formState.email) {
-      newErrors.email = 'Email is required'
-      isValid = false
-    } else if (!validateEmail(formState.email)) {
-      newErrors.email = 'Invalid email format'
-      isValid = false
-    }
+    setErrors(newErrors)
 
-    if (!formState.message) {
-      newErrors.message = 'Message is required'
-      isValid = false
-    }
-
-    setFormErrors(newErrors)
-
-    if (isValid) {
-      setIsSubmitted(true) // Установить состояние успешной отправки
-      setFormState({ name: '', email: '', message: '' }) // Очистить поля формы
-      setFormErrors({ name: '', email: '', message: '' }) // Очистить ошибки
+    // Если нет ошибок
+    if (!Object.values(newErrors).some(error => error)) {
+      setIsSubmitted(true)
+      setFormData({ name: '', email: '', message: '' })
     }
   }
 
@@ -93,85 +66,71 @@ export const Contact = () => {
       <div className='flex justify-center items-center h-full'>
         <div className='bg-opacity-50 p-8 w-11/12 md:w-3/4 lg:w-2/3 xl:w-1/2'>
           <h2 className='text-8xl font-bold text-center mb-6'>Напиши мне</h2>
+
           {isSubmitted && (
             <p className='text-green-500 text-xl text-center mb-4'>
-              Спасибо за отправленное сообщение! В ближайшее время я обязательно
-              отвечу.
+              Спасибо за сообщение! Я отвечу в ближайшее время.
             </p>
           )}
+
           <form onSubmit={handleSubmit} className='flex flex-col space-y-4'>
             <div>
-              <label
-                htmlFor='name'
-                className='block text-3xl font-medium mb-2 text-center'
-              >
+              <label className='block text-3xl font-medium mb-2 text-center'>
                 Имя
               </label>
               <input
                 type='text'
-                id='name'
                 name='name'
                 className='w-full p-2 border rounded text-black bg-white'
-                placeholder='Your Name'
-                value={formState.name}
+                value={formData.name}
                 onChange={handleChange}
               />
-              {formErrors.name && (
+              {errors.name && (
                 <p className='text-red-500 text-xl text-center'>
-                  {formErrors.name}
+                  {errors.name}
                 </p>
               )}
             </div>
 
             <div>
-              <label
-                htmlFor='email'
-                className='block text-3xl font-medium mb-2 text-center'
-              >
+              <label className='block text-3xl font-medium mb-2 text-center'>
                 Почта
               </label>
               <input
                 type='email'
-                id='email'
                 name='email'
                 className='w-full p-2 border rounded text-black bg-white'
-                placeholder='Your Email'
-                value={formState.email}
+                value={formData.email}
                 onChange={handleChange}
               />
-              {formErrors.email && (
+              {errors.email && (
                 <p className='text-red-500 text-xl text-center'>
-                  {formErrors.email}
+                  {errors.email}
                 </p>
               )}
             </div>
 
             <div>
-              <label
-                htmlFor='message'
-                className='block text-3xl font-medium mb-2 text-center'
-              >
+              <label className='block text-3xl font-medium mb-2 text-center'>
                 Сообщение
               </label>
               <textarea
-                id='message'
                 name='message'
                 rows={6}
                 className='w-full p-2 border rounded text-black bg-white'
-                placeholder='Your Message'
-                value={formState.message}
+                value={formData.message}
                 onChange={handleChange}
               />
-              {formErrors.message && (
+              {errors.message && (
                 <p className='text-red-500 text-xl text-center'>
-                  {formErrors.message}
+                  {errors.message}
                 </p>
               )}
             </div>
 
             <button
               type='submit'
-              className='bg-blue-300 hover:bg-blue-400 text-black font-bold py-2 px-4 rounded mt-4 w-full'
+              className='bg-blue-300 hover:bg-blue-400 text-black font-bold py-2 px-4 rounded mt-4 w-full transition-colors'
             >
               Отправить
             </button>
