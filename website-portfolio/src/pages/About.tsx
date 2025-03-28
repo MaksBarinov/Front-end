@@ -8,13 +8,13 @@ export const About = () => {
           <img
             src={ImageNow}
             alt='Profile'
-            className='rounded-2xl w-2/6 object-cover hover:scale-110 transition-normal duration-200'
+            className=' w-2/6 object-cover hover:scale-110 transition-normal duration-200'
           />
           <div className='text-center w-3/5 space-y-20'>
             <h1 className=' text-9xl font-extrabold flex justify-center mb-30'>
               Обо мне
             </h1>
-            <p className='text-2xl text-left font-extralight'>
+            <p className='text-2xl text-left font-light'>
               <span className='hover:bg-pink-300 transition-colors duration-300'>
                 Сейчас я учусь на третьем курсе ДВФУ по направлению
               </span>{' '}
@@ -31,8 +31,10 @@ export const About = () => {
                 от фотографии до сапсерфинга,
               </span>
               <span className='hover:bg-gray-300 transition-colors duration-300'>
-                что помогло мне расширить кругозор и завести много новых
-                знакомств.
+                что помогло мне расширить кругозор и
+              </span>{' '}
+              <span className='hover:bg-green-300 transition-colors duration-300'>
+                завести много новых знакомств.
               </span>
             </p>
             <p className='text-xl text-left font-semibold'>
